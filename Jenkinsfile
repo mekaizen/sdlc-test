@@ -1,9 +1,9 @@
 pipeline {
     agent {
-      docker {
-        image 'docker'  // Use Docker image that has Docker CLI
-        args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
-      }
+     docker {
+                 image 'docker:latest'  // Use Docker image that has Docker CLI
+                 args '--privileged -v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket and run in privileged mode
+             }
     }
   tools{
   maven 'maven'
