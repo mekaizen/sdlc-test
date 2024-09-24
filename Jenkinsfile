@@ -34,10 +34,10 @@ pipeline {
                 script {
                     // Start the application for testing locally on port 8081
                 sh '''
-                                nohup java -jar target/sdlc-test-0.0.1-SNAPSHOT.jar --server.port=8082 > app.log 2>&1 &
+                                nohup java -jar target/sdlc-test-0.0.1-SNAPSHOT.jar --server.port=8084 > app.log 2>&1 &
                             '''
                             // Increase sleep time to ensure application fully starts
-                            sleep 30
+                            sleep 10
                 }
             }
         }
@@ -46,7 +46,7 @@ pipeline {
                 script {
                     // Check if the application is running and accessible on port 8081
                     sh '''
-                        curl -I http://localhost:8082 || {
+                        curl -I http://localhost:8084 || {
                             echo "Application is not running!"
                             exit 1
                         }
@@ -79,7 +79,7 @@ pipeline {
                             -v ${WORKSPACE}:/zap/wrk \
                             -v ${WORKSPACE}/zap_temp:/home/zap \
                             --user=130:139 \
-                            zaproxy/zap-stable zap-baseline.py -t http://localhost:8082 || {
+                            zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 || {
                                 echo "ZAP Baseline Scan failed"
                                 exit 1
                             }
