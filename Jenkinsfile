@@ -47,12 +47,15 @@ pipeline {
                    // Pull the ZAP Docker image and run the scan against the local app
                                sh '''
                                docker pull zaproxy/zap-stable
-                               mkdir -p ${WORKSPACE}/zap_temp
-                               docker run --network="host" \
-                               -v ${WORKSPACE}:/zap/wrk \
-                               -v ${WORKSPACE}/zap_temp:/home/zap \
-                               --user=130:139 \
-                               zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 -r /zap/wrk/zap_report.html
+                                           mkdir -p ${WORKSPACE}/zap_temp
+                                           chown 130:139 ${WORKSPACE}/zap_temp  # Ensure proper permissions
+                                           docker run --network="host" \
+                                           -v ${WORKSPACE}:/zap/wrk \
+                                           -v ${WORKSPACE}/zap_temp:/home/zap \
+                                           --user=130:139 \
+                                           zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 -r /zap/wrk/zap_report.html
+
+
                                '''
                 }
             }
