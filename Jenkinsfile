@@ -67,36 +67,31 @@ pipeline {
             steps {
                 script {
                    // Pull the ZAP Docker image and run the scan against the local app on port 8081
-                      sh '''
-                                    docker pull zaproxy/zap-stable
+                     sh '''
+                                     docker pull zaproxy/zap-stable
 
-                                    # Create a temporary directory for ZAP output
-                                    mkdir -p ${WORKSPACE}/zap_temp
+                                     # Ensure proper permissions for the zap_temp directory
+                                     mkdir -p ${WORKSPACE}/zap_temp
+                                     chmod 777 ${WORKSPACE}/zap_temp  # Set full permissions for ZAP to write
 
-                                    # Remove any existing ZAP report
-                                    if [ -f ${WORKSPACE}/zap_report.html ]; then
-                                        rm ${WORKSPACE}/zap_report.html
-                                    fi
+                                     echo "Contents of workspace:"
+                                     ls -la ${WORKSPACE}
 
-                                    echo "Contents of workspace:"
-                                    ls -la ${WORKSPACE}
+                                     echo "Contents of zap_temp:"
+                                     ls -la ${WORKSPACE}/zap_temp
 
-                                    echo "Contents of zap_temp:"
-                                    ls -la ${WORKSPACE}/zap_temp
+                                     # Run the ZAP baseline scan in debug mode
+                                     docker run --network="host" \
+                                         -v ${WORKSPACE}:/zap/wrk \
+                                         -v ${WORKSPACE}/zap_temp:/home/zap \
+                                         zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d || {
+                                             echo "ZAP Baseline Scan failed"
+                                             exit 1
+                                         }
 
-                                    # Run the ZAP baseline scan in debug mode
-                                    docker run --network="host" \
-                                        -v ${WORKSPACE}:/zap/wrk \
-                                        -v ${WORKSPACE}/zap_temp:/home/zap \
-                                        zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d || {
-                                            echo "ZAP Baseline Scan failed"
-                                            exit 1
-                                        }
-
-                                    # Check the contents of zap_out.json
-                                    echo "Contents of zap_out.json:"
-                                    cat ${WORKSPACE}/zap_temp/zap_out.json || echo "zap_out.json is empty"
-                                '''
+                                     echo "Contents of zap_out.json:"
+                                     cat ${WORKSPACE}/zap_temp/zap_out.json || echo "zap_out.json is empty"
+                                 '''
                 }
             }
         }
