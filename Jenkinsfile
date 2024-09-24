@@ -67,40 +67,40 @@ pipeline {
 
 
 stage('ZAP Automation Framework Scan') {
-    steps {
-        script {
-            sh '''
-                docker pull zaproxy/zap-stable
+            steps {
+                script {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+                        sh '''
+                            docker pull zaproxy/zap-stable
 
-                # Ensure proper permissions for the zap_temp directory
-                mkdir -p ${WORKSPACE}/zap_temp
-                chmod 777 ${WORKSPACE}/zap_temp
+                            # Ensure proper permissions for zap_temp and zap_config directories
+                            mkdir -p ${WORKSPACE}/zap_temp
+                            chmod 777 ${WORKSPACE}/zap_temp
+                            mkdir -p ${WORKSPACE}/zap_config
+                            chmod 777 ${WORKSPACE}/zap_config
 
-                # Ensure the zap_config directory is properly set up
-                mkdir -p ${WORKSPACE}/zap_config
-                chmod 777 ${WORKSPACE}/zap_config
+                            # Move zap.yaml to zap_config if needed
+                            if [ -f ${WORKSPACE}/zap_temp/zap.yaml ]; then
+                                mv ${WORKSPACE}/zap_temp/zap.yaml ${WORKSPACE}/zap_config/
+                            fi
 
-                # Move zap.yaml to zap_config if needed
-                if [ -f ${WORKSPACE}/zap_temp/zap.yaml ]; then
-                    mv ${WORKSPACE}/zap_temp/zap.yaml ${WORKSPACE}/zap_config/
-                fi
+                            # Run the ZAP Automation Framework using a different proxy port to avoid conflicts
+                            docker run --network="host" \
+                                -v ${WORKSPACE}:/zap/wrk \
+                                -v ${WORKSPACE}/zap_temp:/home/zap \
+                                -v ${WORKSPACE}/zap_config:/zap/config \
+                                zaproxy/zap-stable zap.sh -cmd -port 8085 -autorun /zap/config/zap.yaml || {
+                                    echo "ZAP Automation Framework Scan failed"
+                                    exit 1
+                                }
 
-                # Run the ZAP Automation Framework using -autorun
-                docker run --network="host" \
-                    -v ${WORKSPACE}:/zap/wrk \
-                    -v ${WORKSPACE}/zap_temp:/home/zap \
-                    -v ${WORKSPACE}/zap_config:/zap/config \
-                    zaproxy/zap-stable zap.sh -cmd -autorun /zap/config/zap.yaml || {
-                        echo "ZAP Automation Framework Scan failed"
-                        exit 1
+                            echo "Contents of zap_out.json:"
+                            cat ${WORKSPACE}/zap_temp/zap_out.json || echo "zap_out.json is empty"
+                        '''
                     }
-
-                echo "Contents of zap_out.json:"
-                cat ${WORKSPACE}/zap_temp/zap_out.json || echo "zap_out.json is empty"
-            '''
+                }
+            }
         }
-    }
-}
 
 
 
