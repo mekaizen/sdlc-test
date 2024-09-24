@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+     agent {
+            docker {
+                image 'maven:3.8.1-jdk-11' // Maven image with JDK 11
+                args '-v /root/.m2:/root/.m2' // Cache Maven dependencies
+            }
+        }
     environment {
         SONAR_TOKEN = credentials('SONAR_TOKEN')
     }
