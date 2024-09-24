@@ -18,6 +18,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/mekaizen/sdlc-test.git'
             }
         }
+
         stage('Build') {
             steps {
                 sh 'mvn clean package'
