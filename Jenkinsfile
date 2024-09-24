@@ -6,7 +6,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/mekaizen/sdlc-test.git'
+//                 git 'https://github.com/mekaizen/sdlc-test.git'
+                            git branch: 'main', url: 'https://github.com/mekaizen/sdlc-test.git'
             }
         }
         stage('Build') {
