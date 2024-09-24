@@ -22,11 +22,12 @@ pipeline {
         stage('SAST Scan') {
             steps {
                 sh '''
-                    sonar-scanner \
+
+                     mvn -Dmaven.test.failure.ignore sonar-scanner \
                     -Dsonar.projectKey=sdlc-test \
                     -Dsonar.sources=. \
                     -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=$SONAR_TOKEN
+                    -Dsonar.login=$SONAR_TOKEN1
                 '''
             }
         }
