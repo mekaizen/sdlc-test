@@ -70,7 +70,7 @@ pipeline {
                                            -v ${WORKSPACE}:/zap/wrk \
                                            -v ${WORKSPACE}/zap_temp:/home/zap \
                                            --user=130:139 \
-                                           zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 -r /zap/wrk/zap_report.html || {
+                                           zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 -r /zap/wrk/zap_report.html -v || {
                                                echo "ZAP Baseline Scan failed"
                                                exit 1
                                            }
