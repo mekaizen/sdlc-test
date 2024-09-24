@@ -1,0 +1,14 @@
+nohup: ignoring input
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2024-09-24T11:36:59.318+05:30  INFO 76848 --- [sdlc-test] [           main] c.example.sdlc_test.SdlcTestApplication  : Starting SdlcTestApplication v0.0.1-SNAPSHOT using Java 17.0.12 with PID 76848 (/home/cyber/Documents/practice/projects/sdlc-test1/target/sdlc-test-0.0.1-SNAPSHOT.jar started by cyber in /home/cyber/Documents/practice/projects/sdlc-test1)
+2024-09-24T11:36:59.321+05:30  INFO 76848 --- [sdlc-test] [           main] c.example.sdlc_test.SdlcTestApplication  : No active profile set, falling back to 1 default profile: "default"
+2024-09-24T11:36:59.647+05:30  INFO 76848 --- [sdlc-test] [           main] c.example.sdlc_test.SdlcTestApplication  : Started SdlcTestApplication in 0.713 seconds (process running for 1.015)
