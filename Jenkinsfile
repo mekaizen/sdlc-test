@@ -35,8 +35,7 @@ pipeline {
                 script {
                     // Start the application for testing locally
                     sh '''
-                    nohup java -jar target/sdlc-test.jar &
-                    '''
+            nohup java -jar target/sdlc-test-0.0.1-SNAPSHOT.jar > app.log 2>&1 &                    '''
                     // Wait a few seconds for the app to start
                     sleep 10
                 }
