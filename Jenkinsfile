@@ -85,12 +85,12 @@ stage('ZAP Automation Framework Scan') {
                     mv ${WORKSPACE}/zap_temp/zap.yaml ${WORKSPACE}/zap_config/
                 fi
 
-                # Run the ZAP Automation Framework
+                # Run the ZAP Automation Framework using -autorun
                 docker run --network="host" \
                     -v ${WORKSPACE}:/zap/wrk \
                     -v ${WORKSPACE}/zap_temp:/home/zap \
                     -v ${WORKSPACE}/zap_config:/zap/config \
-                    zaproxy/zap-stable zap.sh -cmd --auto /zap/config/zap.yaml || {
+                    zaproxy/zap-stable zap.sh -cmd -autorun /zap/config/zap.yaml || {
                         echo "ZAP Automation Framework Scan failed"
                         exit 1
                     }
