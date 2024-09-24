@@ -23,8 +23,6 @@ pipeline {
         stage('SAST Scan') {
             steps {
                 sh '''
-
-//                      mvn -Dmaven.test.failure.ignore sonar-scanner \
                      mvn -Dmaven.test.failure.ignore verify sonar:sonar \
                      -Dsonar.login=$SONAR_TOKEN1 \
                      -Dsonar.projectKey=sdlc-test \
