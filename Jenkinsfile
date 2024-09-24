@@ -1,13 +1,12 @@
 pipeline {
     agent any
     environment {
-        SONAR_TOKEN = credentials('SONAR_TOKEN1') // Assuming you've set up a secret for SonarQube
+        SONAR_TOKEN = credentials('SONAR_TOKEN1')
     }
     stages {
         stage('Checkout') {
             steps {
-//                 git 'https://github.com/mekaizen/sdlc-test.git'
-                            git branch: 'main', url: 'https://github.com/mekaizen/sdlc-test.git'
+                git branch: 'main', url: 'https://github.com/mekaizen/sdlc-test.git'
             }
         }
         stage('Build') {
@@ -33,9 +32,10 @@ pipeline {
         stage('Start Application') {
             steps {
                 script {
-                    // Start the application for testing locally
+                    // Start the application for testing locally on port 8081
                     sh '''
-            nohup java -jar target/sdlc-test-0.0.1-SNAPSHOT.jar > app.log 2>&1 &                    '''
+                        nohup java -jar target/sdlc-test-0.0.1-SNAPSHOT.jar --server.port=8081 > app.log 2>&1 &
+                    '''
                     // Wait a few seconds for the app to start
                     sleep 10
                 }
@@ -44,46 +44,38 @@ pipeline {
         stage('ZAP Baseline Scan') {
             steps {
                 script {
-                   // Pull the ZAP Docker image and run the scan against the local app
-                     sh '''
-                          # Pull the ZAP Docker image
-                                       docker pull zaproxy/zap-stable
+                   // Pull the ZAP Docker image and run the scan against the local app on port 8081
+                    sh '''
+                        docker pull zaproxy/zap-stable
 
-                                       # Create a temporary directory for ZAP
-                                       mkdir -p ${WORKSPACE}/zap_temp
-                                       chown 130:139 ${WORKSPACE}/zap_temp  # Ensure proper permissions
+                        mkdir -p ${WORKSPACE}/zap_temp
+                        chown 130:139 ${WORKSPACE}/zap_temp  # Ensure proper permissions
 
-                                       # Remove existing report file if it exists
-                                       if [ -f ${WORKSPACE}/zap_report.html ]; then
-                                           rm ${WORKSPACE}/zap_report.html
-                                       fi
+                        if [ -f ${WORKSPACE}/zap_report.html ]; then
+                            rm ${WORKSPACE}/zap_report.html
+                        fi
 
-                                       # List workspace contents for debugging
-                                       echo "Contents of workspace:"
-                                       ls -la ${WORKSPACE}
+                        echo "Contents of workspace:"
+                        ls -la ${WORKSPACE}
 
-                                       echo "Contents of zap_temp:"
-                                       ls -la ${WORKSPACE}/zap_temp
+                        echo "Contents of zap_temp:"
+                        ls -la ${WORKSPACE}/zap_temp
 
-                                       # Run the ZAP baseline scan
-                                       docker run --network="host" \
-                                           -v ${WORKSPACE}:/zap/wrk \
-                                           -v ${WORKSPACE}/zap_temp:/home/zap \
-                                           --user=130:139 \
-                                           zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 || {
-                                               echo "ZAP Baseline Scan failed"
-                                               exit 1
-                                           }
-
-
-                     '''
+                        docker run --network="host" \
+                            -v ${WORKSPACE}:/zap/wrk \
+                            -v ${WORKSPACE}/zap_temp:/home/zap \
+                            --user=130:139 \
+                            zaproxy/zap-stable zap-baseline.py -t http://localhost:8081 || {
+                                echo "ZAP Baseline Scan failed"
+                                exit 1
+                            }
+                    '''
                 }
             }
         }
         stage('Publish ZAP Report') {
             steps {
                 script {
-                    // Publish the ZAP scan report in Jenkins
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: false,
@@ -96,18 +88,17 @@ pipeline {
             }
         }
 
-          stage('Publish') {
-                    steps {
-                        sh 'mvn deploy'
-                    }
-                }
+        stage('Publish') {
+            steps {
+                sh 'mvn deploy'
+            }
+        }
 
-                stage('Deploy to Kubernetes') {
-                    steps {
-                        sh 'kubectl apply -f k8s/deployment.yaml'
-                    }
-                }
-
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh 'kubectl apply -f k8s/deployment.yaml'
+            }
+        }
     }
     post {
         success {
@@ -117,7 +108,6 @@ pipeline {
             echo 'Build failed'
         }
         always {
-            // Clean up after the build
             script {
                 sh '''
                 docker container prune -f
