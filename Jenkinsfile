@@ -29,7 +29,7 @@ pipeline {
                      mvn -Dmaven.test.failure.ignore verify sonar:sonar \
                      -Dsonar.login=$SONAR_TOKEN \
                      -Dsonar.projectKey=sdlc-test \
-                     -Dsonar.host.url=http://localhost:9000/
+                     -Dsonar.host.url=http://sonarqube:9000/
                 '''
             }
         }
