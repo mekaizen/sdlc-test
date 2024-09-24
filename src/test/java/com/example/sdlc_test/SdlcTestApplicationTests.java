@@ -11,4 +11,10 @@ class SdlcTestApplicationTests {
 		System.out.println(" test one");
 	}
 
+
+	@Test
+	void runTest(){
+		System.out.println(" test 2");
+	}
+
 }
