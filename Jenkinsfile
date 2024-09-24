@@ -130,23 +130,48 @@ stage('ZAP Automation Framework Scan') {
 //             }
 //         }
 
-stage('Install kubectl') {
-            steps {
-                sh '''
-                               curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
-                               chmod +x ./kubectl
-                               '''
-            }
-        }
 
 
-      stage('Deploy to Kubernetes') {
-                  steps {
-                      sh '''
-                      ./kubectl apply -f k8s/deployment.yaml
-                      '''
-                  }
-              }
+// Build Docker image for local Kubernetes deployment
+    stage('Build Docker Image') {
+      steps {
+        sh '''
+          docker build -t sdlc-test:0.0.1-SNAPSHOT .
+        '''
+      }
+    }
+
+    // Optional: Set Docker environment for Minikube (if applicable)
+    stage('Set Minikube Docker Env') {
+      when {
+        expression { sh(script: 'minikube status > /dev/null 2>&1', returnStatus: true) == 0 }
+      }
+      steps {
+        sh 'eval $(minikube docker-env)'
+      }
+    }
+
+    // Install kubectl for Kubernetes deployment
+    stage('Install kubectl') {
+      steps {
+        sh '''
+          curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x ./kubectl
+          mkdir -p $HOME/.local/bin
+          mv ./kubectl $HOME/.local/bin/kubectl
+        '''
+      }
+    }
+
+    // Deploy the application to Kubernetes
+    stage('Deploy to Kubernetes') {
+      steps {
+        sh '''
+          ./kubectl apply -f k8s/deployment.yaml
+        '''
+      }
+    }
+
     }
     post {
         success {

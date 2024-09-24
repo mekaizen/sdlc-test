@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdlc-test-deployment
+  labels:
+    app: sdlc-test
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sdlc-test
+  template:
+    metadata:
+      labels:
+        app: sdlc-test
+    spec:
+      containers:
+        - name: sdlc-test
+          image: sdlc-test:0.0.1-SNAPSHOT # Local image loaded into Kind
+          ports:
+            - containerPort: 8080
