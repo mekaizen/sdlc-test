@@ -54,6 +54,14 @@ pipeline {
                 }
             }
         }
+        stage('Check Application Logs') {
+            steps {
+                script {
+                    // Output the application logs
+                    sh 'cat app.log'
+                }
+            }
+        }
 
         stage('ZAP Baseline Scan') {
             steps {
