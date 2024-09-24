@@ -88,11 +88,12 @@ stage('ZAP Baseline Scan') {
                 echo "Contents of zap_config:"
                 ls -la ${WORKSPACE}/zap_config
 
-                # Run the ZAP baseline scan and pass the full path to the zap.yaml file
+                # Run the ZAP baseline scan and use the correct container path for zap.yaml
                 docker run --network="host" \
                     -v ${WORKSPACE}:/zap/wrk \
                     -v ${WORKSPACE}/zap_temp:/home/zap \
-                    zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d -c ${WORKSPACE}/zap_config/zap.yaml || {
+                    -v ${WORKSPACE}/zap_config:/zap/config \
+                    zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d -c /zap/config/zap.yaml || {
                         echo "ZAP Baseline Scan failed"
                         exit 1
                     }
