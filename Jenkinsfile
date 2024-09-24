@@ -24,11 +24,11 @@ pipeline {
             steps {
                 sh '''
 
-                     mvn -Dmaven.test.failure.ignore sonar-scanner \
-                    -Dsonar.projectKey=sdlc-test \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=$SONAR_TOKEN1
+//                      mvn -Dmaven.test.failure.ignore sonar-scanner \
+                     mvn -Dmaven.test.failure.ignore verify sonar:sonar \
+                     -Dsonar.login=$SONAR_TOKEN1 \
+                     -Dsonar.projectKey=sdlc-test \
+                     -Dsonar.host.url=http://localhost:9000/
                 '''
             }
         }
