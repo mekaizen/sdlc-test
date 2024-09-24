@@ -63,6 +63,8 @@ pipeline {
             }
         }
 
+
+
 stage('ZAP Baseline Scan') {
     steps {
         script {
@@ -73,7 +75,7 @@ stage('ZAP Baseline Scan') {
                 mkdir -p ${WORKSPACE}/zap_temp
                 chmod 777 ${WORKSPACE}/zap_temp  # Set full permissions for ZAP to write
 
-                # Create a directory specifically for the zap.yaml file
+                # Ensure the zap_config directory is properly set up
                 mkdir -p ${WORKSPACE}/zap_config
                 chmod 777 ${WORKSPACE}/zap_config  # Ensure ZAP can write here
 
@@ -83,12 +85,14 @@ stage('ZAP Baseline Scan') {
                 echo "Contents of zap_temp:"
                 ls -la ${WORKSPACE}/zap_temp
 
-                # Run the ZAP baseline scan and pass the configuration file using '-c'
+                echo "Contents of zap_config:"
+                ls -la ${WORKSPACE}/zap_config
+
+                # Run the ZAP baseline scan and pass the full path to the zap.yaml file
                 docker run --network="host" \
                     -v ${WORKSPACE}:/zap/wrk \
                     -v ${WORKSPACE}/zap_temp:/home/zap \
-                    -v ${WORKSPACE}/zap_config:/zap/config \
-                    zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d -c /zap/config/zap.yaml || {
+                    zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d -c ${WORKSPACE}/zap_config/zap.yaml || {
                         echo "ZAP Baseline Scan failed"
                         exit 1
                     }
@@ -99,8 +103,6 @@ stage('ZAP Baseline Scan') {
         }
     }
 }
-
-
 
 
 
