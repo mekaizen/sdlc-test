@@ -48,9 +48,11 @@ pipeline {
                     // Pull the ZAP Docker image and run the scan against the local app
                     sh '''
                     docker pull zaproxy/zap-stable
-                    docker run --network="host" \
-                    -v ${WORKSPACE}:/zap/wrk \
-                    zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 -r /zap/wrk/zap_report.html
+                docker run --network="host" \
+                            -v ${WORKSPACE}:/zap/wrk \
+                            --user=130:139 \
+                            zaproxy/zap-stable zap-baseline.py -t http://localhost:8080 -r /zap/wrk/zap_report.html
+
                     '''
                 }
             }
