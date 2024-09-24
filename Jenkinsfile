@@ -41,6 +41,20 @@ pipeline {
                 }
             }
         }
+        stage('Verify Application Running') {
+            steps {
+                script {
+                    // Check if the application is running and accessible on port 8081
+                    sh '''
+                        curl -I http://localhost:8081 || {
+                            echo "Application is not running!"
+                            exit 1
+                        }
+                    '''
+                }
+            }
+        }
+
         stage('ZAP Baseline Scan') {
             steps {
                 script {
