@@ -65,30 +65,27 @@ pipeline {
 
 
 
+
 stage('ZAP Baseline Scan') {
     steps {
         script {
             sh '''
                 docker pull zaproxy/zap-stable
 
-                # Ensure proper permissions for the zap_temp directory
+                # Ensure proper permissions for zap_temp directory
                 mkdir -p ${WORKSPACE}/zap_temp
-                chmod 777 ${WORKSPACE}/zap_temp  # Set full permissions for ZAP to write
+                chmod 777 ${WORKSPACE}/zap_temp
 
                 # Ensure the zap_config directory is properly set up
                 mkdir -p ${WORKSPACE}/zap_config
-                chmod 777 ${WORKSPACE}/zap_config  # Ensure ZAP can write here
+                chmod 777 ${WORKSPACE}/zap_config
 
-                echo "Contents of workspace:"
-                ls -la ${WORKSPACE}
+                # Move zap.yaml to zap_config if needed
+                if [ -f ${WORKSPACE}/zap_temp/zap.yaml ]; then
+                    mv ${WORKSPACE}/zap_temp/zap.yaml ${WORKSPACE}/zap_config/
+                fi
 
-                echo "Contents of zap_temp:"
-                ls -la ${WORKSPACE}/zap_temp
-
-                echo "Contents of zap_config:"
-                ls -la ${WORKSPACE}/zap_config
-
-                # Run the ZAP baseline scan and use the correct container path for zap.yaml
+                # Run ZAP Baseline Scan with Docker
                 docker run --network="host" \
                     -v ${WORKSPACE}:/zap/wrk \
                     -v ${WORKSPACE}/zap_temp:/home/zap \
@@ -98,12 +95,14 @@ stage('ZAP Baseline Scan') {
                         exit 1
                     }
 
-                echo "Contents of zap_out.json:"
+                # Check the output
                 cat ${WORKSPACE}/zap_temp/zap_out.json || echo "zap_out.json is empty"
             '''
         }
     }
 }
+
+
 
 
 
