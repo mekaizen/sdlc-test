@@ -66,13 +66,13 @@ pipeline {
 
 
 
-stage('ZAP Baseline Scan') {
+stage('ZAP Automation Framework Scan') {
     steps {
         script {
             sh '''
                 docker pull zaproxy/zap-stable
 
-                # Ensure proper permissions for zap_temp directory
+                # Ensure proper permissions for the zap_temp directory
                 mkdir -p ${WORKSPACE}/zap_temp
                 chmod 777 ${WORKSPACE}/zap_temp
 
@@ -85,23 +85,22 @@ stage('ZAP Baseline Scan') {
                     mv ${WORKSPACE}/zap_temp/zap.yaml ${WORKSPACE}/zap_config/
                 fi
 
-                # Run ZAP Baseline Scan with Docker
+                # Run the ZAP Automation Framework
                 docker run --network="host" \
                     -v ${WORKSPACE}:/zap/wrk \
                     -v ${WORKSPACE}/zap_temp:/home/zap \
                     -v ${WORKSPACE}/zap_config:/zap/config \
-                    zaproxy/zap-stable zap-baseline.py -t http://localhost:8084 -d -c /zap/config/zap.yaml || {
-                        echo "ZAP Baseline Scan failed"
+                    zaproxy/zap-stable zap.sh -cmd --auto /zap/config/zap.yaml || {
+                        echo "ZAP Automation Framework Scan failed"
                         exit 1
                     }
 
-                # Check the output
+                echo "Contents of zap_out.json:"
                 cat ${WORKSPACE}/zap_temp/zap_out.json || echo "zap_out.json is empty"
             '''
         }
     }
 }
-
 
 
 
