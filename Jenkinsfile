@@ -135,17 +135,19 @@ stage('Install kubectl') {
                 sh '''
                 curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" \
                 && chmod +x ./kubectl \
-                && mv ./kubectl /usr/local/bin/kubectl
+                && mv ./kubectl $HOME/.local/bin/kubectl || mv ./kubectl ./kubectl
                 '''
             }
         }
 
 
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-            }
-        }
+      stage('Deploy to Kubernetes') {
+                  steps {
+                      sh '''
+                      ./kubectl apply -f k8s/deployment.yaml
+                      '''
+                  }
+              }
     }
     post {
         success {
