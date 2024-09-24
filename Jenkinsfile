@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+    agent {
+      docker {
+        image 'docker:latest'  // Use Docker image that has Docker CLI
+        args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+      }
+    }
   tools{
   maven 'maven'
 
