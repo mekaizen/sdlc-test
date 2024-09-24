@@ -124,11 +124,11 @@ stage('ZAP Automation Framework Scan') {
             }
         }
 
-        stage('Publish') {
-            steps {
-                sh 'mvn deploy'
-            }
-        }
+//         stage('Publish') {
+//             steps {
+//                 sh 'mvn deploy'
+//             }
+//         }
 
         stage('Deploy to Kubernetes') {
             steps {
